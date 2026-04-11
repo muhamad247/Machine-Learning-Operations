@@ -1,0 +1,23 @@
+{
+  "latest": "f96167cb56fb",
+  "versions": {
+    "f96167cb56fb": {
+      "path": "data\\versioned\\online_retail_f96167cb56fb.parquet",
+      "rows": 1067371,
+      "columns": [
+        "invoice_no",
+        "stock_code",
+        "description",
+        "quantity",
+        "invoice_date",
+        "price",
+        "customer_id",
+        "country",
+        "source_sheet",
+        "year_month"
+      ],
+      "created_at": "2026-04-08T17:38:12.567076+00:00",
+      "source_url": "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip"
+    }
+  }
+}
