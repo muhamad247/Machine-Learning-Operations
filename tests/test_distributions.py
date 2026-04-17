@@ -1,12 +1,16 @@
 """
-Tests for attribute value distributions (price and country)
+Tests for attribute value distributions (price, country and time series)
 
-These two columns represent the most business-critical dimensions:
+These columns represent the most business-critical dimensions:
   price   → directly affects revenue calculations
   country → defines the geographic scope of the business
+  time    → ensures the data is consistent across the full time series
+
 
 For price we check the lower end, upper end and the overall shape.
 For country we check the dominant value, if hte known markets exist and the unknown countries
+For time series we use January 2010 as a reference month and compare other months against it.
+
 
 Choosing ID-like columns (invoice_no, stock_code) would be 
 pointless since their distribution carries no business meaning.
@@ -29,6 +33,18 @@ from src.data_loader import resolve_latest
 def regular_orders() -> pd.DataFrame:
     df = pd.read_parquet(resolve_latest())
     return df[~df["invoice_no"].str.startswith("C", na=False)].reset_index(drop=True)
+
+
+@pytest.fixture(scope="module")
+def reference_month(regular_orders) -> pd.DataFrame:
+    """
+    January 2010 — used as the reference month for time series tests.
+
+    We chose January 2010 because it is a stable, non-seasonal month in the
+    middle of the dataset with no Christmas or holiday effects that would
+    distort the baseline.
+    """
+    return regular_orders[regular_orders["year_month"] == "2010-01"]
 
 
 # Attribute 1: price
@@ -149,3 +165,89 @@ class TestCountryDistribution:
         assert unspecified_rate <= 0.02, (
             f"'Unspecified' is {unspecified_rate:.2%} of rows, expected ≤ 2%."
         )
+
+
+# Attribute 3: time series consistency
+
+class TestTimeSeriesDistribution:
+    """
+    Distribution checks over time using January 2010 as a reference month.
+
+    January 2010 was chosen because it is a stable, non-seasonal month in the
+    middle of the dataset. We compare other months against it to detect
+    anomalies that only show up in specific time periods.
+    """
+
+    def test_all_months_have_data(self, regular_orders):
+        """
+        Every month between Dec 2009 and Dec 2011 must have at least one order.
+
+        Reasoning: this is a continuous transaction log. A month with zero
+        orders would indicate missing data in the extract, not a real business
+        gap — the retailer operated year-round.
+        """
+        months = pd.period_range("2009-12", "2011-12", freq="M").astype(str)
+        actual_months = set(regular_orders["year_month"].unique())
+        missing = [m for m in months if m not in actual_months]
+        assert not missing, (
+            f"Missing data for months: {missing}. Dataset may be incomplete."
+        )
+
+    def test_monthly_uk_share_consistent(self, regular_orders, reference_month):
+        """
+        UK share per month must stay within 15 percentage points of January 2010.
+
+        Reasoning: the UK share in January 2010 reflects the baseline business
+        geography. We allow ±15% to tolerate genuine seasonal variation
+        (e.g. more international orders around Christmas) without missing
+        a scenario where the country column breaks for an entire month.
+        """
+        ref_uk_share = reference_month["country"].eq("United Kingdom").mean()
+
+        monthly_uk = (
+            regular_orders.groupby("year_month")["country"]
+            .apply(lambda x: x.eq("United Kingdom").mean())
+        )
+
+        outliers = monthly_uk[abs(monthly_uk - ref_uk_share) > 0.15]
+        assert outliers.empty, (
+            f"These months have UK share deviating >15% from reference "
+            f"({ref_uk_share:.1%}):\n{outliers}"
+        )
+
+    def test_monthly_median_price_consistent(self, regular_orders, reference_month):
+        """
+        Median price per month must stay within £5 of January 2010.
+
+        Reasoning: the median price reflects the typical product mix. We allow
+        ±£5 to tolerate seasonal shifts like Christmas gift items being more
+        expensive. A larger deviation would suggest a data issue like prices
+        being recorded in a different currency for certain months.
+        """
+        ref_median = reference_month["price"].median()
+
+        monthly_median = regular_orders.groupby("year_month")["price"].median()
+
+        outliers = monthly_median[abs(monthly_median - ref_median) > 5.0]
+        assert outliers.empty, (
+            f"These months have median price deviating >£5 from reference "
+            f"(£{ref_median:.2f}):\n{outliers}"
+        )
+
+    def test_monthly_null_rate_consistent(self, regular_orders):
+        """
+        Description null rate per month must not exceed 5%.
+
+        Reasoning: the overall null rate is 0.41%. A month with more than 5%
+        null descriptions would indicate a data ingestion failure for that
+        specific time period rather than normal variation.
+        """
+        monthly_null = (
+            regular_orders.groupby("year_month")["description"]
+            .apply(lambda x: x.isna().mean())
+        )
+
+        outliers = monthly_null[monthly_null > 0.05]
+        assert outliers.empty, (
+            f"These months have description null rate above 5%:\n{outliers}"
+        )    

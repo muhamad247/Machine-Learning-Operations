@@ -65,3 +65,23 @@ This way the same data always produces the same filename, and different versions
 | UK share | ≥ 80% | Leaves room for genuine growth in international orders |
 | UK, Ireland, Germany, France present | always | These are consistently the top 4 markets — if they're missing, something is wrong with the extract |
 | Unspecified | ≤ 2% | This is the placeholder for unknown countries — a spike means geo-lookup failed upstream |
+
+**time series:** We use January 2010 as a reference month and compare other months against it:
+
+| Check | Threshold | Why |
+|---|---|---|
+| All months have data | always | A missing month means the extract is incomplete |
+| Monthly UK share | within ±15% of reference | Tolerates seasonal variation but catches column corruption |
+| Monthly median price | within ±£5 of reference | Tolerates seasonal shifts but catches currency or mapping errors |
+| Monthly description null rate | ≤ 5% | Overall rate is 0.41%; above 5% means ingestion failed for that month |
+
+### test_cancelled_orders.py
+
+Tests the cancelled orders segment separately to verify they follow the expected pattern:
+
+| Check | Threshold | Why |
+|---|---|---|
+| Quantities are negative | ≥ 99% | Cancellations reverse the original order so quantities must be negative |
+| Prices are positive | ≥ 99% | Price reflects the original unit price, so should always be positive |
+| Invoice numbers start with 'C' | 100% | This is the definition of a cancellation record in this dataset |
+
