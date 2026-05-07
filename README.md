@@ -150,3 +150,14 @@ When running `py -m src.flow --simulate-error`:
 - **Step 2 (training):** the dataset is artificially shrunk to 500 rows, which is below the `MIN_ROWS = 1000` threshold. Training raises `InsufficientDataError` with a clear message and the pipeline stops cleanly.
 
 This demonstrates the induced error handling working as intended.
+
+**When running with Docker (`docker-compose up --build`):**
+- Step 1 runs inside its own container with only pandas, pyarrow and pytest installed
+- Step 2 runs inside its own container with scikit-learn and joblib added
+- Step 3 runs inside its own container with numpy added
+- Results are identical to the local run — all 17 tests pass, model trains successfully, robustness check catches the weak model
+
+**When running with Docker and simulated error (`$env:SIMULATE_ERROR=1; docker-compose up --build`):**
+- Step 1 passes all 17 tests
+- Step 2 stops with InsufficientDataError — 500 rows is below the 1000 minimum
+- Step 3 never runs since Step 2 failed

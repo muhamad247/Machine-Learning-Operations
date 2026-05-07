@@ -197,3 +197,22 @@ def _load_manifest() -> dict:
 
 def _save_manifest(manifest: dict) -> None:
     MODEL_MANIFEST.write_text(json.dumps(manifest, indent=2))
+
+
+# Entry point for direct execution (used by Docker step 2)
+
+if __name__ == "__main__":
+    import os
+    import sys
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-8s  %(message)s")
+
+    # SIMULATE_ERROR=1 environment variable triggers the small dataset scenario
+    simulate = os.environ.get("SIMULATE_ERROR", "0") == "1"
+
+    try:
+        train_model(simulate_small_dataset=simulate)
+        sys.exit(0)
+    except InsufficientDataError as e:
+        logger.error("Training failed: %s", e)
+        sys.exit(1)

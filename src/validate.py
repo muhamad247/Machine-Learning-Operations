@@ -107,3 +107,18 @@ def _r2_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     if ss_tot == 0:
         return 0.0
     return 1.0 - ss_res / ss_tot
+
+
+# Entry point for direct execution (used by Docker step 3)
+
+if __name__ == "__main__":
+    import sys
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-8s  %(message)s")
+
+    try:
+        validate_model()
+        sys.exit(0)
+    except RobustnessCheckFailed as e:
+        logger.error("Robustness check failed: %s", e)
+        sys.exit(1)    

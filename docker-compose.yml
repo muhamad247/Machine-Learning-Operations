@@ -1,0 +1,49 @@
+# docker-compose orchestrates the 3-step ML pipeline
+#
+# Each step is its own container with its own minimal dependencies.
+# Steps run sequentially: step2 only starts if step1 succeeded,
+# step3 only starts if step2 succeeded.
+#
+# Shared volumes:
+#   data/versioned/  → read-only, contains the Parquet dataset
+#   models/          → read-write, where step2 saves the model and step3 reads it
+#
+# Usage:
+#   docker-compose up --build               # full pipeline
+#   SIMULATE_ERROR=1 docker-compose up --build  # demo induced training error
+
+services:
+
+  step1_data_tests:
+    build:
+      context: .
+      dockerfile: docker/step1_data_tests/Dockerfile
+    image: mlops-step1
+    volumes:
+      - ./data/versioned:/app/data/versioned:ro
+
+  step2_train:
+    build:
+      context: .
+      dockerfile: docker/step2_train/Dockerfile
+    image: mlops-step2
+    environment:
+      - SIMULATE_ERROR=${SIMULATE_ERROR:-0}
+    volumes:
+      - ./data/versioned:/app/data/versioned:ro
+      - ./models:/app/models
+    depends_on:
+      step1_data_tests:
+        condition: service_completed_successfully
+
+  step3_validate:
+    build:
+      context: .
+      dockerfile: docker/step3_validate/Dockerfile
+    image: mlops-step3
+    volumes:
+      - ./data/versioned:/app/data/versioned:ro
+      - ./models:/app/models:ro
+    depends_on:
+      step2_train:
+        condition: service_completed_successfully

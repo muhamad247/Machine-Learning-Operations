@@ -131,7 +131,9 @@ def resolve_latest() -> Path:
         raise FileNotFoundError(
             "No versioned dataset found. Run `py -m src.data_loader` first."
         )
-    return Path(manifest["versions"][manifest["latest"]]["path"])
+    # Convert backslashes to forward slashes for cross-platform compatibility
+    raw_path = manifest["versions"][manifest["latest"]]["path"]
+    return Path(raw_path.replace("\\", "/"))
 
 
 # Internal helpers
