@@ -1,0 +1,17 @@
+{
+  "run_id": "6fc441a4bc20",
+  "config": {
+    "run_name": "v1-baseline",
+    "train_end_month": "2011-06",
+    "model_type": "linear",
+    "features": [
+      "price",
+      "country"
+    ],
+    "simulate_error": false
+  },
+  "model_hash": "7740c223bad9",
+  "status": "robustness_failed",
+  "error": "Model R^2 (-0.0022) did not beat baseline (-0.0000). The model has not learned anything useful from the features.",
+  "timestamp": "2026-05-25T15:12:39.825748+00:00"
+}

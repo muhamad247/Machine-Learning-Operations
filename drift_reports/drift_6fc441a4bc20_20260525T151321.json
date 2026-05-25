@@ -1,0 +1,19 @@
+{
+  "run_id": "6fc441a4bc20",
+  "train_end_month": "2011-06",
+  "reference_rows": 756664,
+  "unseen_rows": 291213,
+  "price_psi": {
+    "value": 0.02651619056799367,
+    "moderate_threshold": 0.1,
+    "significant_threshold": 0.25,
+    "verdict": "no_significant_drift"
+  },
+  "country_chi_square": {
+    "chi2_stat": 4359.579486512895,
+    "p_value": 0.0,
+    "n_categories": 42,
+    "alpha": 0.05,
+    "verdict": "drift_detected"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "test_id": "ab-002",
+  "timestamp": "2026-05-25T15:16:19.969179+00:00",
+  "train_end_month": "2011-06",
+  "dropped_no_customer_id": 65936,
+  "branch_a": {
+    "run_id": "6fc441a4bc20",
+    "run_name": "v1-baseline",
+    "model_type": "linear",
+    "features": [
+      "price",
+      "country"
+    ],
+    "rows": 104592,
+    "mae": 11.184891153314592,
+    "r2": -0.06238635289548089
+  },
+  "branch_b": {
+    "run_id": "fc7a1df7db03",
+    "run_name": "v2-enriched",
+    "model_type": "ridge",
+    "features": [
+      "price",
+      "country",
+      "stock_code"
+    ],
+    "rows": 120685,
+    "mae": 12.64026391005534,
+    "r2": -0.012342687262786312
+  },
+  "winner": "A"
+}

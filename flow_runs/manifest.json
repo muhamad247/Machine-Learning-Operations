@@ -1,0 +1,35 @@
+{
+  "runs": {
+    "6fc441a4bc20": {
+      "model_hash": "7740c223bad9",
+      "status": "robustness_failed",
+      "config": {
+        "run_name": "v1-baseline",
+        "train_end_month": "2011-06",
+        "model_type": "linear",
+        "features": [
+          "price",
+          "country"
+        ],
+        "simulate_error": false
+      },
+      "timestamp": "2026-05-25T15:12:39.825748+00:00"
+    },
+    "fc7a1df7db03": {
+      "model_hash": "16cde6595495",
+      "status": "robustness_failed",
+      "config": {
+        "run_name": "v2-enriched",
+        "train_end_month": "2011-06",
+        "model_type": "ridge",
+        "features": [
+          "price",
+          "country",
+          "stock_code"
+        ],
+        "simulate_error": false
+      },
+      "timestamp": "2026-05-25T15:13:01.050062+00:00"
+    }
+  }
+}

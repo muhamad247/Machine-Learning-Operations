@@ -1,5 +1,5 @@
 {
-  "latest": "7fbf1db24b76",
+  "latest": "16cde6595495",
   "versions": {
     "7fbf1db24b76": {
       "path": "models/model_7fbf1db24b76.joblib",
@@ -19,6 +19,60 @@
         "joblib"
       ],
       "model_type": "LinearRegression with OneHotEncoder for country"
+    },
+    "7740c223bad9": {
+      "path": "models\\model_7740c223bad9.joblib",
+      "created_at": "2026-05-25T15:12:37.589233+00:00",
+      "training_rows": 756664,
+      "features": [
+        "price",
+        "country"
+      ],
+      "target": "quantity",
+      "model_type": "linear",
+      "train_end_month": "2011-06",
+      "training_score": 0.009270387050157702,
+      "min_category_frequency": 50,
+      "input_schema": {
+        "price": "float",
+        "country": "string"
+      },
+      "output_schema": {
+        "quantity": "float"
+      },
+      "dependencies": [
+        "scikit-learn>=1.1",
+        "pandas",
+        "joblib"
+      ]
+    },
+    "16cde6595495": {
+      "path": "models\\model_16cde6595495.joblib",
+      "created_at": "2026-05-25T15:12:59.037081+00:00",
+      "training_rows": 756664,
+      "features": [
+        "price",
+        "country",
+        "stock_code"
+      ],
+      "target": "quantity",
+      "model_type": "ridge",
+      "train_end_month": "2011-06",
+      "training_score": 0.024348142197811895,
+      "min_category_frequency": 50,
+      "input_schema": {
+        "price": "float",
+        "country": "string",
+        "stock_code": "string"
+      },
+      "output_schema": {
+        "quantity": "float"
+      },
+      "dependencies": [
+        "scikit-learn>=1.1",
+        "pandas",
+        "joblib"
+      ]
     }
   }
 }

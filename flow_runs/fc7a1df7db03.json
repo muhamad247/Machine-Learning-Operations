@@ -1,0 +1,18 @@
+{
+  "run_id": "fc7a1df7db03",
+  "config": {
+    "run_name": "v2-enriched",
+    "train_end_month": "2011-06",
+    "model_type": "ridge",
+    "features": [
+      "price",
+      "country",
+      "stock_code"
+    ],
+    "simulate_error": false
+  },
+  "model_hash": "16cde6595495",
+  "status": "robustness_failed",
+  "error": "Model R^2 (-0.0300) did not beat baseline (-0.0000). The model has not learned anything useful from the features.",
+  "timestamp": "2026-05-25T15:13:01.050062+00:00"
+}
